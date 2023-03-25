@@ -16,6 +16,8 @@
 
 Singly-linked list, simply called *linked list*, is a data structure composed of individual elements, each linked by a single pointer. Each element consists of two parts: a data member and a pointer, called the *next* pointer. Using this two-member structure, a linked list is formed by setting the next pointer of each element to point to the element that follows it. The next pointer of the last element is set to *NULL*, , a convenient sentinel marking the end of the list.
 
+By default, you cannot create nodes with *NULL* as its data field. To allow *NULL* nodes to be inserted into a list, you need to compile a program with `NULL_ELMS` flag.
+
 ## API
 
 ### List_init

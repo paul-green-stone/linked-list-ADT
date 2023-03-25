@@ -8,8 +8,6 @@
 
 /* ================================================================ */
 
-// #define NULL_ELMS
-
 #define INIT_SUCCESS EXIT_SUCCESS
 #define PRINT_NULL (1 << 0) /* 1 */
 #define MATCH_NULL (1 << 1) /* 2 */
