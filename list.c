@@ -28,20 +28,18 @@ int List_init(struct List* list, void (*destroy)(void* data), void (*print)(cons
     int status_code = EXIT_SUCCESS;
 
     if (list != NULL) {
-        status_code |= ((list->print = print) == NULL) ? PRINT_NULL : EXIT_SUCCESS;
-        status_code |= ((list->match = match) == NULL) ? MATCH_NULL : EXIT_SUCCESS;
+        status_code |= ((list->print = print) == NULL) ? PRINT_NULL : INIT_SUCCESS;
+        status_code |= ((list->match = match) == NULL) ? MATCH_NULL : INIT_SUCCESS;
 
-        if (status_code != EXIT_SUCCESS) {
-            return status_code;
+        if (status_code == INIT_SUCCESS) {
+            list->destroy = destroy;
+            list->print = print;
+            list->match = match;
+
+            list->head = list->tail = NULL;
+
+            list->size = 0;
         }
-
-        list->destroy = destroy;
-        list->print = print;
-        list->match = match;
-
-        list->head = list->tail = NULL;
-
-        list->size = 0;
     }
 
     return status_code;
@@ -55,7 +53,7 @@ int List_insert_first(struct List* list, const void* data) {
     struct Node* node = NULL;
 
     if (list != NULL) {
-        if ((node = (struct Node*) Node_create(data)) != NULL) {
+        if ((node = Node_create(data)) != NULL) {
             switch (list->size) {
                 case 0:
                     list->head = list->tail = node;
@@ -136,7 +134,7 @@ int List_insert_last(struct List* list, const void* data) {
     struct Node* t;
 
     if (list != NULL) {
-        if ((node = (struct Node*) Node_create(data)) != NULL) {
+        if ((node = Node_create(data)) != NULL) {
             switch (list->size) {
                 case 0:
                     list->tail = list->head = node;
