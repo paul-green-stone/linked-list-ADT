@@ -25,7 +25,7 @@ static struct Node* Node_create(const void* data) {
 /* ================================================================ */
 
 int List_init(struct List* list, void (*destroy)(void* data), void (*print)(const void* data), int (*match)(const void* data_1, const void* data_2)) {
-    int status_code = EXIT_SUCCESS;
+    int status_code = INIT_SUCCESS;
 
     if (list != NULL) {
         status_code |= ((list->print = print) == NULL) ? PRINT_NULL : INIT_SUCCESS;
@@ -48,7 +48,7 @@ int List_init(struct List* list, void (*destroy)(void* data), void (*print)(cons
 /* ================================================================ */
 
 int List_insert_first(struct List* list, const void* data) {
-    int status_code = EXIT_FAILURE;
+    int status_code = 0;
 
     struct Node* node = NULL;
 
@@ -57,16 +57,18 @@ int List_insert_first(struct List* list, const void* data) {
             switch (list->size) {
                 case 0:
                     list->head = list->tail = node;
+
                     break;
 
                 default: 
                     node->next = list->head;
                     list->head = node;
+
                     break;
             }
 
             list->size++;
-            status_code = EXIT_SUCCESS;
+            status_code = 1;
         }
     }
 
@@ -128,7 +130,7 @@ void List_display(const struct List* list, void (*print)(const void* data)) {
 /* ================================================================ */
 
 int List_insert_last(struct List* list, const void* data) {
-    int status_code = EXIT_FAILURE;
+    int status_code = 0;
 
     struct Node* node = NULL;
     struct Node* t;
@@ -138,15 +140,18 @@ int List_insert_last(struct List* list, const void* data) {
             switch (list->size) {
                 case 0:
                     list->tail = list->head = node;
+
                     break;
 
                 default: 
                     list->tail->next = node;
                     list->tail = node;
+
+                    break ;
             }
 
             list->size++;
-            status_code = EXIT_SUCCESS;
+            status_code = 1;
         }
     }
 
@@ -186,10 +191,12 @@ void* List_remove_first(struct List* list) {
             switch (list->size) {
                 case 1:
                     list->head = list->tail = NULL;
+
                     break;
 
                 default:
                     list->head = list->head->next;
+
                     break;
             }
 
@@ -217,6 +224,7 @@ void* List_remove_last(struct List* list) {
             switch (list->size) {
                 case 1:
                     list->head = list->tail = NULL;
+
                     break;
 
                 default:
@@ -224,6 +232,8 @@ void* List_remove_last(struct List* list) {
 
                     temp->next = NULL;
                     list->tail = temp;
+
+                    break ;
             }
 
             list->size--;
@@ -272,7 +282,7 @@ void* List_remove_node(struct List* list, struct Node* node) {
 /* ================================================================ */
 
 int List_insert_before(struct List* list, const void* data, const struct Node* node) {
-    int status_code = EXIT_FAILURE;
+    int status_code = 0;
     struct Node* new_node = NULL;
     struct Node* temp = NULL;
 
@@ -290,7 +300,7 @@ int List_insert_before(struct List* list, const void* data, const struct Node* n
 
                     list->size++;
 
-                    status_code = EXIT_SUCCESS;
+                    status_code = 1;
                 }
             }
         }
@@ -302,7 +312,7 @@ int List_insert_before(struct List* list, const void* data, const struct Node* n
 /* ================================================================ */
 
 int List_insert_after(struct List* list, const void* data, const struct Node* node) {
-    int status_code = EXIT_FAILURE;
+    int status_code = 0;
     struct Node* new_node = NULL;
     struct Node* temp = NULL;
 
@@ -320,7 +330,7 @@ int List_insert_after(struct List* list, const void* data, const struct Node* no
 
                     list->size++;
 
-                    status_code = EXIT_SUCCESS;
+                    status_code = 1;
                 }
             }
         }
@@ -352,15 +362,15 @@ void List_destroy(struct List* list) {
 /* ================================================================ */
 
 int List_each(const struct List* list, void (*callback)(void* data)) {
-    int status_code = EXIT_FAILURE;
+    int status_code = 0;
 
-    if (Lis_init(list) && callback != NULL) {
+    if ((list->print && list->match) && callback != NULL) {
         if (list->size > 0) {
             for (struct Node* node = list->head; node != NULL; node = node->next) {
                 callback(node->data);
             }
 
-            status_code = EXIT_SUCCESS;
+            status_code = 1;
         }
     }
 

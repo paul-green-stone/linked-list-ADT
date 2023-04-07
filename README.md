@@ -57,7 +57,7 @@ The `List_insert_first` function inserts an element with the specified `data` at
 | `struct List* list` | The list to insert into |
 | `const void* data` | Data to be inserted |
 
-On success, the function returns `EXIT_SUCCESS`.
+On success, the function returns 1.
 
 ### List_insert_last
 
@@ -72,7 +72,7 @@ The `List_insert_last` function inserts an element with the specified `data` at 
 | `struct List* list` | The list to insert into |
 | `const void* data` | Data to be inserted |
 
-On success, the function returns `EXIT_SUCCESS`.
+On success, the function returns 1.
 
 ### List_display
 
@@ -154,6 +154,8 @@ The `List_insert_before` function inserts a node with specified data in a list b
 | `const void* data` | Data to insert |
 | `const struct Node* node` | A node to insert before (*insert before this node if it's in the list*) |
 
+On success, the function returns 1.
+
 ### List_insert_after
 
 ```C
@@ -167,6 +169,8 @@ The `List_insert_after` function inserts a node with specified data in a list af
 | `struct List* list` | A list to insert into |
 | `const void* data` | Data to insert |
 | `const struct Node* node` | A node to insert after (*insert after this node if it's in the list*) |
+
+On success, the function returns 1.
 
 ### List_destroy
 

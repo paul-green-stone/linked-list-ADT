@@ -12,8 +12,6 @@
 #define PRINT_NULL (1 << 0) /* 1 */
 #define MATCH_NULL (1 << 1) /* 2 */
 
-#define Lis_init(list) ((list->print != NULL && list->match != NULL))
-
 /* ================================================================ */
 
 struct Node {
