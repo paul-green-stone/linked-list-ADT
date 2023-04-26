@@ -1,110 +1,82 @@
-#ifndef LIST_H
-#define LIST_H
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
 
 /* ================================================================ */
 
-#define INIT_SUCCESS EXIT_SUCCESS
-#define PRINT_NULL (1 << 0) /* 1 */
-#define MATCH_NULL (1 << 1) /* 2 */
+#include "data.h"
+#include "guard.h"
+
+typedef struct _node* Node;             /* A pointer to an incomplite type */
+
+typedef struct _linked_list* List;      /* A pointer to an incomplite type */
+
+/* ================================ */
+
+/*
+    * Create a linked list and return a handle to it
+*/
+extern List List_new(void (*fptr_destroy)(void*), void (*fptr_print)(const Data));
+
+/*
+    * Display a linked list
+*/
+extern void List_print(const List list, void (*fptr_print)(const Data));
+
+/*
+    * Insert a new element with specified data at the beginning of the linked list
+*/
+extern int8_t List_insert_first(List list, const Data data);
+
+/*
+    * Insert a new element with specified data at the end of the linked list
+*/
+extern int8_t List_insert_last(List list, const Data data);
+
+/*
+    * Find a node in the list with specified data (the first occurrence)
+*/
+extern Node List_find(const List list, const Data data, int (*fptr_match)(const Data data_1, const Data data_2));
+
+/*
+    * Remove the first element from the list
+*/
+extern Data List_remove_first(List list);
+
+/*
+    * Remove the last element from the list
+*/
+extern Data List_remove_last(List list);
+
+/*
+    * Return the list size
+*/
+extern size_t List_get_size(const List list);
+
+/*
+    * Destroy the linked list
+*/
+extern void List_destroy(List* list);
+
+/*
+    * Merge two lists into one
+*/
+extern int8_t List_merge(List* dest, List* src);
+
+/*
+    * Remove the specified node from the list
+*/
+extern Data List_remove_node(List list, Node node);
+
+/*
+    * Insert an element with the specified data after the node in the list
+*/
+extern int8_t List_insert_after(List list, const Data data, const Node node);
+
+/*
+    * Insert an element with the specified data before the node in the list
+*/
+extern int8_t List_insert_before(List list, const Data data, const Node node);
 
 /* ================================================================ */
-
-struct Node {
-    void* data;
-
-    struct Node* next;
-};
-
-struct List {
-    struct Node* head;
-    struct Node* tail;
-
-    size_t size;
-
-    void (*destroy)(void*);
-    void (*print)(const void*);
-    int (*match)(const void*, const void*);
-};
-
-/* ================================================================ */
-
-/*
-    * Initializes the linked list specified by `list`. This operation must
-    * be called for a linked list before the list can be used with any other operation.
-    * The `destroy` argument provides a way to free dynamically allocated data when `List_destroy` 
-    * is called.
-*/
-extern int List_init(struct List* list, void (*destroy)(void* data), void (*print)(const void* data), int (*match)(const void* data_1, const void* data_2));
-
-/* 
-    * Inserts an element at the beginning of the linked list.
-*/
-extern int List_insert_first(struct List* list, const void* data);
-
-/*
-    * Outputs content of the linked list. The `print` argument is a callback function 
-    * that is called for every node in the list for this particular `List_display` invokation.
-    * It does not overwrite the default `print` function (e.g., specified in the `List_init`). If
-    * `print` is NULL, the default `print` is used.
-*/
-extern void List_display(const struct List* list, void (*print)(const void* data));
-
-/*
-    * Inserts an element at the end of the linked list.
-*/
-extern int List_insert_last(struct List* list, const void* data);
-
-/*
-    * Looks for a node with the given data.
-    *
-    * Returns a pointer to the list node with specified data. NULL inidcates the absence of a node with such data.
-*/
-extern struct Node* List_find(const struct List* list, const void* data, int (*match)(const void*, const void*));
-
-/*
-    * Removes the first element from the list.
-
-    * Returns a pointer to data in a node.
-*/
-extern void* List_remove_first(struct List* list);
-
-/*
-    * Removes the last element from the list.
-
-    * Returns a pointer to data in a node.
-*/
-extern void* List_remove_last(struct List* list);
-
-/*
-    * Removes the specified node from the given list.
-
-    * Returns a pointer to data from removed element or NULL if there is no such node in the list.
-*/
-extern void* List_remove_node(struct List* list, struct Node* node);
-
-/*
-    * Insert a new node with specified data before another node
-*/
-extern int List_insert_before(struct List* list, const void* data, const struct Node* node);
-
-/*
-    * Insert a new node with specified data after another node.
-*/
-extern int List_insert_after(struct List* list, const void* data, const struct Node* node);
-
-/*
-    * Destroys a linked list.
-*/
-extern void List_destroy(struct List* list);
-
-/*
-    * Applies a callback function to every node data in a list.
-*/
-extern int List_each(const struct List* list, void (*callback)(void* data));
 
 #endif

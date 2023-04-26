@@ -1,5 +1,5 @@
 cc = gcc
-objs = temp/main.o temp/list.o
+objs = temp/main.o temp/list.o temp/guard.o
 dirs = temp
 CFLAGS = -O1
 
@@ -11,6 +11,9 @@ temp/main.o: main.c
 
 temp/list.o: list.h list.c
 	$(cc) -c -g -o temp/list.o list.c
+
+temp/guard.o:	guard.h guard.c
+	$(cc) -c -g -o temp/guard.o guard.c
 
 .PHONY: clean
 

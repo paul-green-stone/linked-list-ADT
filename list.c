@@ -1,149 +1,144 @@
 #include "list.h"
 
-static struct Node* Node_create(const void* data) {
-    struct Node* node = NULL;
+struct _node {
+    Data data;
 
-    #ifndef NULL_ELMS
-        if (data == NULL) {
-            return NULL;
-        }
-    #endif
+    struct _node* next;
+};
 
-    if ((node = (struct Node*) malloc(sizeof(struct Node))) != NULL) {
-        node->data = (void*) data;
+struct _linked_list {
+    size_t size;                        /* Number of elements in the list */
+
+    struct _node* head;                 /* First element of the list */
+    struct _node* tail;                 /* Last element of the list */
+
+    void (*fptr_destroy)(void*);        /* Destroys every element of the list */
+    void (*fptr_print)(const Data);     /* Displays the list */
+};
+
+/* ================================================================ */
+
+static Node Node_new(const Data data) {
+    Node node = NULL;
+
+    if (data == NULL) {
+        warn_with_user_msg(__func__, "data can't be NULL");
+
+        return node;
+    }
+
+    if ((node = (Node) malloc(sizeof(struct _node))) != NULL) {
+        node->data = (Data) data;
         node->next = NULL;
     }
     else {
-        fprintf(stderr, "%s\n", strerror(errno));
+        warn_with_sys_msg("Memory allocation failure");
     }
 
     return node;
 }
 
-/* ================================================================ */
-/* ================================================================ */
-/* ================================================================ */
+/* ================================ */
 
-int List_init(struct List* list, void (*destroy)(void* data), void (*print)(const void* data), int (*match)(const void* data_1, const void* data_2)) {
-    int status_code = INIT_SUCCESS;
+List List_new(void (*fptr_destroy)(void*), void (*fptr_print)(const Data)) {
+    List list = NULL;
 
-    if (list != NULL) {
-        status_code |= ((list->print = print) == NULL) ? PRINT_NULL : INIT_SUCCESS;
-        status_code |= ((list->match = match) == NULL) ? MATCH_NULL : INIT_SUCCESS;
+    if ((list = (List) malloc(sizeof(struct _linked_list))) != NULL) {
+        list->size = 0;
+        list->head = list->tail = NULL;
 
-        if (status_code == INIT_SUCCESS) {
-            list->destroy = destroy;
-            list->print = print;
-            list->match = match;
-
-            list->head = list->tail = NULL;
-
-            list->size = 0;
-        }
+        list->fptr_destroy = fptr_destroy;
+        list->fptr_print = fptr_print;
+    }
+    else {
+        warn_with_sys_msg("List_new() error");
     }
 
-    return status_code;
+    return list;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-int List_insert_first(struct List* list, const void* data) {
-    int status_code = 0;
-
-    struct Node* node = NULL;
+void List_print(const List list, void (*fptr_print)(const Data)) {
+    void (*alt_fptr_print)(const Data) = NULL;
 
     if (list != NULL) {
-        if ((node = Node_create(data)) != NULL) {
-            switch (list->size) {
-                case 0:
-                    list->head = list->tail = node;
+        if ((list->fptr_print == NULL) && (fptr_print == NULL)) {
+            warn_with_user_msg(__func__, "there is no associated `print` function with the list");
 
-                    break;
-
-                default: 
-                    node->next = list->head;
-                    list->head = node;
-
-                    break;
-            }
-
-            list->size++;
-            status_code = 1;
-        }
-    }
-
-    return status_code;
-}
-
-/* ================================================================ */
-
-void List_display(const struct List* list, void (*print)(const void* data)) {
-    #ifdef NULL_ELMS
-        size_t n = 0;
-    #endif
-
-    void (*printrout_t)(const void* data);
-
-    if (list != NULL) {
-        if (list->print == NULL) {
-            /* 
-             * The list has not been initialized.
-             * You cannot avoid specifying the list->print callback in List_init function.
-             * This does not allow the List_display function to dispaly "[]".
-            */
             return ;
         }
 
-        printrout_t = (print == NULL) ? list->print : print;
+        printf("[");
 
         if (list->size > 0) {
-            for (struct Node* node = list->head; node != NULL; node = node->next) {
-                if (node->data == NULL) {
-                    #ifdef NULL_ELMS
-                        n += 1;
-                    #endif
+            alt_fptr_print = (list->fptr_print == NULL) ? fptr_print : list->fptr_print;
 
-                    continue;
-                }
-
-                printrout_t(node->data);
+            for (Node node = list->head; node != NULL; node = node->next) {
+                alt_fptr_print(node->data);
 
                 if (node->next != NULL) {
                     printf(", ");
                 }
             }
-
-            #ifdef NULL_ELMS
-                printf("\n(%lu/%zu)", list->size - n, list->size);
-            #endif
-        }
-        else {
-            printf("[]");
         }
 
-        printf("\n");
+        printf("]\n");
+    }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
     }
 
     return ;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-int List_insert_last(struct List* list, const void* data) {
-    int status_code = 0;
-
-    struct Node* node = NULL;
-    struct Node* t;
+int8_t List_insert_first(List list, const Data data) {
+    int8_t result = 0;
+    Node node = NULL;
 
     if (list != NULL) {
-        if ((node = Node_create(data)) != NULL) {
+        if ((node = Node_new(data)) != NULL) {
+            switch (list->size) {
+                case 0:
+                    list->head = list->tail = node;
+
+                    break ;
+
+                default:
+                    node->next = list->head;
+                    list->head = node;
+
+                    break ;
+            }
+
+            list->size++;
+            result = 1;
+        }
+    }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
+    }
+
+    return result;
+}
+
+/* ================================ */
+
+int8_t List_insert_last(List list, const Data data) {
+    int8_t result = 0;
+    Node node = NULL;
+
+    if (list != NULL) {
+        if ((node = Node_new(data)) != NULL) {
             switch (list->size) {
                 case 0:
                     list->tail = list->head = node;
 
-                    break;
+                    break ;
 
-                default: 
+                default:
                     list->tail->next = node;
                     list->tail = node;
 
@@ -151,107 +146,180 @@ int List_insert_last(struct List* list, const void* data) {
             }
 
             list->size++;
-            status_code = 1;
+            result = 0;
         }
     }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
+    }
 
-    return status_code;
+    return result;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-struct Node* List_find(const struct List* list, const void* data, int (*match)(const void* data_1, const void* data_2)) {
-    int (*matchroute_t)(const void*, const void*);
-    struct Node* node = NULL;
+ Node List_find(const List list, const Data data, int (*fptr_match)(const Data data_1, const Data data_2)) {
+    Node node = NULL;
 
     if (list != NULL) {
-        matchroute_t = (match == NULL) ? list->match : match;
-
-        for (node = list->head; node != NULL; node = node->next) {
-            if (matchroute_t(node->data, data) == 0) {
-                break ;
+        if (data != NULL) {
+            if (fptr_match != NULL) {
+                for (node = list->head; node != NULL; node = node->next) {
+                    if (fptr_match(node->data, data) == 0) {
+                        return node;
+                    }
+                }
+            }
+            else {
+                warn_with_user_msg(__func__, "match argument can't be NULL");
             }
         }
+        else {
+            warn_with_user_msg(__func__, "data argument can't be NULL");
+        }
+    }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
     }
 
     return node;
-}
+ }
 
-/* ================================================================ */
+ /* ================================ */
 
-void* List_remove_first(struct List* list) {
-    void* data = NULL;
-    struct Node* node = NULL;
+Data List_remove_first(List list) {
+    Node node = NULL;
+    Data data = NULL;
 
     if (list != NULL) {
         if (list->size > 0) {
-            data = list->head->data;
             node = list->head;
+            data = node->data;
 
-            switch (list->size) {
-                case 1:
-                    list->head = list->tail = NULL;
+            list->head = node->next;
 
-                    break;
-
-                default:
-                    list->head = list->head->next;
-
-                    break;
+            if (list->size == 1) {
+                list->tail = list->head;
             }
 
             list->size--;
 
+            memset(node, 0, sizeof(struct _node));
             free(node);
         }
+    }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
     }
 
     return data;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-void* List_remove_last(struct List* list) {
-    void *data = NULL;
-    struct Node* node = NULL;
-    struct Node* temp = NULL;
+size_t List_get_size(const List list) {
+    return (list != NULL) ? list->size : -1;
+}
+
+/* ================================ */
+
+Data List_remove_last(List list) {
+    Node node = NULL;                   /* A node to be freed */
+    Data data = NULL;                   /* A pointer to the returned data */
 
     if (list != NULL) {
         if (list->size > 0) {
-            data = list->tail->data;
             node = list->tail;
+            data = node->data;
 
-            switch (list->size) {
-                case 1:
-                    list->head = list->tail = NULL;
+            if (list->size == 1) {
+                list->tail = list->head = NULL;
+            }
+            else {
+                Node temp = NULL;                   /* Used to traverse the list */
 
-                    break;
+                for (temp = list->head; temp->next != list->tail; temp = temp->next) ;
 
-                default:
-                    for (temp = list->head; temp->next != list->tail; temp = temp->next) ;
-
-                    temp->next = NULL;
-                    list->tail = temp;
-
-                    break ;
+                list->tail = temp;
+                temp->next = NULL;
             }
 
             list->size--;
 
+            memset(node, 0, sizeof(struct _node));
             free(node);
         }
+    }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
     }
 
     return data;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-void* List_remove_node(struct List* list, struct Node* node) {
-    void* data = NULL;
-    struct Node* temp = NULL;
+void List_destroy(List* list) {
+    Data data = NULL;
 
-    if (list != NULL && node != NULL) {
+    if ((list != NULL) && (*list != NULL)) {
+        while ((*list)->size > 0) {
+            data = List_remove_first(*list);
+            
+            if ((*list)->fptr_destroy != NULL) {
+                (*list)->fptr_destroy(data);
+
+                Data* ptr_data = &data;
+                *ptr_data = NULL;
+            }
+        }
+
+        /* Deallocate memory */
+        free(*list);
+
+        *list = NULL;
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+extern int8_t List_merge(List* dest, List* src) {
+    int8_t result = 0;
+
+    /* Test for dest */
+    if ((dest != NULL) && (*dest != NULL)) {
+        /* Test fot src */
+        if ((src != NULL) && (*src != NULL)) {
+            (*dest)->tail->next = (*src)->head;
+            (*dest)->tail = (*src)->tail;
+            (*dest)->size += (*src)->size;
+
+            /* After the merge, the `src` list is eliminated */
+            *src = NULL;
+
+            result = 1;
+        }
+    }
+
+    return result;
+}
+
+/* ================================ */
+
+Data List_remove_node(List list, Node node) {
+    Data data = NULL;                   /* Returned data */
+
+    /* 
+        * It's safe to specify node as NULL because it doesn't cause run-time errors.
+        * However, we simply return from function.
+    */
+    if (node == NULL) {
+        return data;
+    }
+
+    if (list != NULL) {
         if (list->size > 0) {
             if (node == list->head) {
                 data = List_remove_first(list); 
@@ -260,119 +328,145 @@ void* List_remove_node(struct List* list, struct Node* node) {
                 data = List_remove_last(list);
             }
             else {
+                Node temp = NULL;                   /* Used to traverse the list */
+
+                /* Make sure the specified node is in the list */
                 for (temp = list->head; temp != NULL && temp->next != node; temp = temp->next) ;
 
-                if (temp == NULL) {
-                    return data;
+                /* The node IS in the list */
+                if (temp != NULL) {
+                    data = temp->next->data;
+                    temp->next = temp->next->next;
+
+                    list->size--;
+                    
+                    /* Clear any sensitive data */
+                    memset(node, 0, sizeof(struct _node));
+                    /* Dealocate memory */
+                    free(node);
                 }
-
-                data = temp->next->data;
-                temp->next = temp->next->next;
-
-                list->size--;
-
-                free(node);
             }
         }
+    }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
     }
     
     return data;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-int List_insert_before(struct List* list, const void* data, const struct Node* node) {
-    int status_code = 0;
-    struct Node* new_node = NULL;
-    struct Node* temp = NULL;
+/* ================================================================ */
+/* ================================================================ */
+/*
+    * `List_insert_after` and `List_insert_before` functions add a new element
+    * with the specified data after and before the specified node respectively.
+    * 
+    * Traversing a list is a time-consuming operation which depends on the number of elements in the list.
+    * 
+    * The thing is to decide whether we should create a node first or traverse the list
+    * in search for the node.
+    * 
+    * In the first variant, we don't need to traverse the list which may
+    * have thousands of elements just to realize that `data` is NULL (e.g., we can't have nodes with NULL
+    * as its data). When the new node is allocated and we know that the specifid node is not in the list
+    * we need to deallocate the node and its data field according to the list `fptr_destroy` "member".
+    * If memory allocation failure occurs while we are creating a node, meaning we don't have enough memory
+    * for another node, we don't need to traverse a list too. Keep in mind that nothing stops you from
+    * specifying a node which is not in the list, meaning the list is traversed until its end.
+    * 
+    * Another solution is to traverse the list first and then create a node. In this scenario the list is
+    * traversed every time we insert data into the list (except several condition described below).
+    * 
+    * I decided to stick with the first solution because it 
+*/
+
+int8_t List_insert_after(List list, const Data data, const Node node) {
+    int8_t result = 0;
 
     if (list != NULL) {
-        if (list->size == 0 || node == NULL || node == list->head) {
-            status_code = List_insert_first(list, data);
+        if ((list->size == 0) || (node == NULL) || (node == list->tail)) {
+            result = List_insert_last(list, data);
         }
         else {
-            for (temp = list->head; temp != NULL && temp->next != node; temp = temp->next) ;
+            Node new_node = NULL;
 
-            if (temp != NULL) {
-                if ((new_node = Node_create(data)) != NULL) {
+            if ((new_node = Node_new(data)) != NULL) {
+                Node temp = NULL;
+                /* Make sure the specified node is in the list */
+                for (temp = list->head; temp != NULL && temp != node; temp = temp->next) ;
+
+                /* The node IS in the list */
+                if (temp != NULL) {
                     new_node->next = temp->next;
                     temp->next = new_node;
 
                     list->size++;
 
-                    status_code = 1;
+                    result = 1;
+                }
+                else {
+                    if (list->fptr_destroy != NULL) {
+                        list->fptr_destroy(data);
+                    }
+
+                    free(new_node);
                 }
             }
         }
     }
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
+    }
 
-    return status_code;
+    return result;
 }
 
-/* ================================================================ */
+/* ================================ */
 
-int List_insert_after(struct List* list, const void* data, const struct Node* node) {
-    int status_code = 0;
-    struct Node* new_node = NULL;
-    struct Node* temp = NULL;
+int8_t List_insert_before(List list, const Data data, const Node node) {
+    int8_t result = 0;
 
     if (list != NULL) {
-        if (list->size == 0 || node == NULL || node == list->tail) {
-            status_code = List_insert_last(list, data);
+        if ((list->size == 0) || (node == NULL) || (node == list->head)) {
+            result = List_insert_first(list, data);
         }
         else {
-            for (temp = list->head; temp != NULL && temp != node; temp = temp->next) ;
+            Node new_node = NULL;
 
-            if (temp != NULL) {
-                if ((new_node = Node_create(data)) != NULL) {
+            if ((new_node = Node_new(data)) != NULL) {
+                Node temp = NULL;
+                /* Make sure the specified node is in the list */
+                for (temp = list->head; temp != NULL && temp->next != node; temp = temp->next) ;
+
+                /* The node IS in the list */
+                if (temp != NULL) {
                     new_node->next = temp->next;
                     temp->next = new_node;
 
                     list->size++;
 
-                    status_code = 1;
+                    result = 1;
+                }
+                else {
+                    if (list->fptr_destroy != NULL) {
+                        list->fptr_destroy(data);
+                    }
+
+                    free(new_node);
                 }
             }
         }
     }
-
-    return status_code;
-}
-
-/* ================================================================ */
-
-void List_destroy(struct List* list) {
-    void* data;
-
-    if (list != NULL) {
-        while (list->size > 0) {
-            data = List_remove_last(list);
-
-            if (list->destroy) {
-                list->destroy(data);
-            }
-        }
-
-        memset(list, 0, sizeof(struct List));
+    else {
+        warn_with_user_msg(__func__, "list can't be NULL");
     }
 
-    return ;
+    return result;
 }
+
+/* ================================ */
 
 /* ================================================================ */
-
-int List_each(const struct List* list, void (*callback)(void* data)) {
-    int status_code = 0;
-
-    if ((list->print && list->match) && callback != NULL) {
-        if (list->size > 0) {
-            for (struct Node* node = list->head; node != NULL; node = node->next) {
-                callback(node->data);
-            }
-
-            status_code = 1;
-        }
-    }
-
-    return status_code;
-}
+/* ================================================================ */
