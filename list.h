@@ -4,7 +4,7 @@
 /* ================================================================ */
 
 #include "data.h"
-#include "guard.h"
+#include "guard/guard.h"
 
 typedef struct _node* Node;             /* A pointer to an incomplite type */
 
