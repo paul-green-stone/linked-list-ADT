@@ -8,8 +8,6 @@
 
 [Examples](#examples)
 
-[Return Values](#return-values)
-
 [Resources](#resources)
 
 ## About
