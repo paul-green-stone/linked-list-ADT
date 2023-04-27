@@ -40,6 +40,26 @@ static Node Node_new(const Data data) {
 
 /* ================================ */
 
+static Data Node_destroy(Node* node) {
+    Data data = NULL;
+
+    if ((node != NULL) && (*node != NULL)) {
+        data = (*node)->data;
+        (*node)->next = NULL;
+
+        /* Clear memory*/
+        memset(*node, 0, sizeof(struct _node));
+        /* Deallocate memory */
+        free(*node);
+
+        *node = NULL;
+    }
+
+    return data;
+}
+
+/* ================================ */
+
 List List_new(void (*fptr_destroy)(void*), void (*fptr_print)(const Data)) {
     List list = NULL;
 
@@ -146,7 +166,7 @@ int8_t List_insert_last(List list, const Data data) {
             }
 
             list->size++;
-            result = 0;
+            result = 1;
         }
     }
     else {
@@ -194,7 +214,6 @@ Data List_remove_first(List list) {
     if (list != NULL) {
         if (list->size > 0) {
             node = list->head;
-            data = node->data;
 
             list->head = node->next;
 
@@ -204,8 +223,7 @@ Data List_remove_first(List list) {
 
             list->size--;
 
-            memset(node, 0, sizeof(struct _node));
-            free(node);
+            data = Node_destroy(&node);
         }
     }
     else {
@@ -230,7 +248,6 @@ Data List_remove_last(List list) {
     if (list != NULL) {
         if (list->size > 0) {
             node = list->tail;
-            data = node->data;
 
             if (list->size == 1) {
                 list->tail = list->head = NULL;
@@ -246,8 +263,7 @@ Data List_remove_last(List list) {
 
             list->size--;
 
-            memset(node, 0, sizeof(struct _node));
-            free(node);
+            data = Node_destroy(&node);
         }
     }
     else {
@@ -274,6 +290,8 @@ void List_destroy(List* list) {
             }
         }
 
+        /* Clear memory */
+        memset(*list, 0, sizeof(struct _linked_list));
         /* Deallocate memory */
         free(*list);
 
@@ -335,15 +353,11 @@ Data List_remove_node(List list, Node node) {
 
                 /* The node IS in the list */
                 if (temp != NULL) {
-                    data = temp->next->data;
                     temp->next = temp->next->next;
 
                     list->size--;
-                    
-                    /* Clear any sensitive data */
-                    memset(node, 0, sizeof(struct _node));
-                    /* Dealocate memory */
-                    free(node);
+
+                    data = Node_destroy(&node);
                 }
             }
         }
