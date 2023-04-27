@@ -1,15 +1,8 @@
 CC = gcc
 objs = temp/main.o temp/list.o guard/temp/guard.o
 dirs = temp
-CFLAGS = -O1
 
-main: $(objs) 
-	$(CC) $(CFLAGS) -o a.out $(objs)
-
-temp/main.o: main.c
-	$(CC) -c -g -o temp/main.o main.c
-
-temp/list.o: list.h list.c
+temp/list.o: list.h list.c guard/temp/guard.o
 	$(CC) -c -g -o temp/list.o list.c
 
 guard/temp/guard.o:
@@ -18,6 +11,7 @@ guard/temp/guard.o:
 .PHONY: clean
 
 clean:
-	rm -rf temp ./*.o a.out
+	rm -rf temp ./*.o *.out
+	rm -rf guard/temp
 
 $(shell mkdir -p $(dirs))
