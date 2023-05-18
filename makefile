@@ -1,25 +1,28 @@
-CC = gcc
-objs = temp/list.o guard/temp/guard.o
-dirs = temp
+cc = gcc
+OBJDIR = objects
+CFLAGS = -c -Wall -O1 -fpic
+AR = ar
+ARFLAGS = -r -c
 
-# Object files
-temp/list.o: list.h list.c guard/temp/guard.o
-	$(CC) -c -g -o temp/list.o list.c
+lib: $(OBJDIR)/list.o
+	$(AR) $(ARFLAGS) liblist.a $(OBJDIR)/list.o $(OBJDIR)/guard.o
 
-guard/temp/guard.o:
-	$(MAKE) -C guard
+$(OBJDIR)/list.o: list.h list.c $(OBJDIR)/guard.o
+	$(CC) -g $(CFLAGS) -o $(OBJDIR)/list.o list.c
 
-# If there is a main.c file
-test: main.o $(objs)
-	$(CC) -o a.out main.o $(objs)
+$(OBJDIR)/guard.o: guard/guard.h guard/guard.c
+	$(cc) -g $(CFLAGS) -o $(OBJDIR)/guard.o guard/guard.c
 
-temp/main.o: main.o $(objs)
-	$(cc) -c -g -o temp/main.o main.c
+test: $(OBJDIR)/main.o liblist.a
+	$(CC) -o a.out $(OBJDIR)/main.o -L. -llist
+
+$(OBJDIR)/main.o: main.c
+	$(cc) -g $(CFLAGS) -o $(OBJDIR)/main.o main.c
 
 .PHONY: clean
 
 clean:
-	rm -rf temp ./*.o *.out
-	rm -rf guard/temp
+	rm -rf $(OBJDIR) ./*.o *.out
+	rm -rf guard/$(OBJDIR)
 
-$(shell mkdir -p $(dirs))
+$(shell mkdir -p $(OBJDIR))
