@@ -1,51 +1,5 @@
 #include "list.h"
 
-/* ================================ */
-
-struct _node {
-    /* pointer to a data container */
-    Data data;
-
-    struct _node* next;
-};
-
-/*
-    --------        ------
-    | data | ----> [ Data ]
-    |      |        ------
-    | next | -> NULL
-    --------
-*/
-
-/* ================================ */
-/* ================================ */
-/* ================================ */
-
-struct _linked_list {
-    /* Number of elements in the list */
-    size_t size;
-
-    /* First element of the list */
-    struct _node* head;
-    /* Last element of the list */
-    struct _node* tail;
-
-    /* Destroys every element of the list */
-    fptr_destroy destroy;
-    /* Displays the list */
-    fptr_print print;
-    /* Compares the linked list node data with provided data */
-    fptr_match match;
-};
-
-/*
-    --------    --------    --------
-    | data |    | data |    | data |
-    |      |    |      |    |      |
-    | next | -> | next | -> | next | -> NULL
-    --------    --------    --------
-*/
-
 /* ================================================================ */
 
 /* Allocate a new instance of a linked list node */

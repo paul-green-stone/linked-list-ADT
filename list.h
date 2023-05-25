@@ -22,8 +22,48 @@ typedef int (*fptr_match)(const Data data_1, const Data data_2);
 /* A pointer to an incomplite type */
 typedef struct _node* Node;
 
+struct _node {
+    /* pointer to a data container */
+    Data data;
+
+    struct _node* next;
+};
+
+/*
+    --------        ------
+    | data | ----> [ Data ]
+    |      |        ------
+    | next | -> NULL
+    --------
+*/
+
 /* A pointer to an incomplite type */
 typedef struct _linked_list* List_t;
+
+struct _linked_list {
+    /* Number of elements in the list */
+    size_t size;
+
+    /* First element of the list */
+    struct _node* head;
+    /* Last element of the list */
+    struct _node* tail;
+
+    /* Destroys every element of the list */
+    fptr_destroy destroy;
+    /* Displays the list */
+    fptr_print print;
+    /* Compares the linked list node data with provided data */
+    fptr_match match;
+};
+
+/*
+    --------    --------    --------
+    | data |    | data |    | data |
+    |      |    |      |    |      |
+    | next | -> | next | -> | next | -> NULL
+    --------    --------    --------
+*/
 
 /* ================================ */
 

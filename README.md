@@ -14,14 +14,6 @@
 
 Singly-linked list, simply called *linked list*, is a data structure composed of individual elements, each linked by a single pointer. Each element consists of two parts: a data member and a pointer, called the *next* pointer. Using this two-member structure, a linked list is formed by setting the next pointer of each element to point to the element that follows it. The next pointer of the last element is set to *NULL*, a convenient sentinel marking the end of the list.
 
-Defined to be a pointer to an incomplete type:
-
-```C
-typdef struct _list* List_t;
-```
-
-one can't access the fields of the `_list` structure. A user ca only work with the data type through the sef of functions descibed below.
-
 ## API
 
 ### List_create
