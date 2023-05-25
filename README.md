@@ -14,134 +14,138 @@
 
 Singly-linked list, simply called *linked list*, is a data structure composed of individual elements, each linked by a single pointer. Each element consists of two parts: a data member and a pointer, called the *next* pointer. Using this two-member structure, a linked list is formed by setting the next pointer of each element to point to the element that follows it. The next pointer of the last element is set to *NULL*, a convenient sentinel marking the end of the list.
 
-The `List` is a pointer to an incomplete type,
+Defined to be a pointer to an incomplete type:
 
 ```C
-typedef struct _linked_list* List;
+typdef struct _list* List_t;
 ```
 
-which means users are allowed to work with lists through the use of specified functions (interfaces, the **first-class ADT pattern** in action).
+one can't access the fields of the `_list` structure. A user ca only work with the data type through the sef of functions descibed below.
 
 ## API
 
-### List_new
+### List_create
 
 ```C
-List List_new(void (*fptr_destroy)(void*), void (*fptr_print)(const Data));
+List List_create(void (*fptr_destroy)(void*), void (*fptr_print)(const Data));
 ```
 
-The `List_new` function allocates a new instance of a linked list.
+The `List_create` function allocates a new instance of a linked list.
 
 | Type | Description |
 | ---- | ----------- |
-| `void (*fptr_destroy)(void*)` | Provides a way to free dynamically allocated data when `List_destroy` is called. If the list contains data dynamically allocated using `malloc`, `destroy` should be set to `free` to free the data as the linked list is destroyed. For structured data containing several dynamically allocated members, destroy should be set to a user-defined function that calls `free` for each dynamically allocated member as well as for the structure itself. For a linked list containing data that should not be freed, destroy should be set to *NULL* |
-| `void (*fptr_print)(const Data)` | Provides a default way to display content of the linked list when `List_display` is invoked. [How to write `print` functions](#how-to-write-print-functions)|
+| `fptr_destroy destroy_func` | Provides a way to free dynamically allocated data when `List_destroy` is called. If the list contains data dynamically allocated using `malloc`, `destroy` should be set to `free` to free the data as the linked list is destroyed. For structured data containing several dynamically allocated members, destroy should be set to a user-defined function that calls `free` for each dynamically allocated member as well as for the structure itself. For a linked list containing data that should not be freed, destroy should be set to *NULL* |
+| `fptr_print print_func` | Provides a default way to display content of the linked list when `List_display` is called. [How to write `print` functions](#how-to-write-print-functions)|
+| `fptr_match match_func` | Provides a default way to compare data residing in the linked list node. See [how to write `match` functions](#how-to-write-match-functions) for details |
 
-On success, the function returns `List`, or *NULL* on failure.
+**Return value**: a new instance of a linked list (`List_t`) on success, `NULL` on failure.
 
 ### List_insert_first
 
 ```C
-int8_t List_insert_first(List list, const Data data);
+int List_insert_first(List_t list, const Data data);
 ```
 
 The `List_insert_first` function inserts an element with the specified `data` at the beginning of the linked list `list`. The function dynamically allocates memory for a list node and places data into it.
 
 | Type | Description |
 | ---- | ----------- |
-| `List list` | The list to insert into |
+| `List_t list` | The list to insert into |
 | `const Data data` | Data to be inserted |
 
-On success, the function returns *1*, *0* on failure.
+**Return value**: *0* if inserting the data is successful, or *-1* otherwise.
 
 ### List_insert_last
 
 ```C
-int8_t List_insert_last(List list, const Data data);
+int List_insert_last(List_t list, const Data data);
 ```
 
 The `List_insert_last` function inserts an element with the specified `data` at the end of the linked list `list`. The function dynamically allocates memory for a list node and places data into it.
 
 | Type | Description |
 | ---- | ----------- |
-| `List list` | The list to insert into |
+| `List_t list` | The list to insert into |
 | `const Data data` | Data to be inserted |
 
-On success, the function returns *1*, or *0* on failure.
+**Return value**: *0* if inserting the data is successful, or *-1* otherwise.
 
 ### List_print
 
 ```C
-void List_print(const List list, void (*fptr_print)(const Data));
+void List_print(const List_t list, void (*fptr_print)(const Data));
 ```
 
-The `List_print` function outputs content of the list. The `fptr_print` argument is a callback function that is called on every node while traversng the list. If `fptr_print` is NULL, the `fptr_print` function specified in `List_new` is used.
+The `List_print` function outputs content of the list. The `fptr_print` argument is an alternative way to display the list content. If `fptr_print` is NULL, the `fptr_print` function specified in `List_create` is used.
 
 | Type | Description |
 | ---- | ----------- |
-| `const List list` | The list to be displayed |
-| `void (*fptr_print)(const Data)` | The callback function to handle data in a node |
+| `const List_t list` | The list to be displayed |
+| `fptr_print print_func` | The callback function to handle data in a node |
+
+**Return value**: none.
 
 ### List_find
 
 ```C
-Node List_find(const List list, const Data data, int (*fptr_match)(const Data data_1, const Data data_2));
+Node List_find(const List list, const Data data);
 ```
 
-The `List_find` function looks for the specified data `data` in the linked list `list`. The `fprt_match` argument is a callback that compares data. While traversing a list, `fptr_match` takes node data as its first parameter `data_1` and data to campare it with as `data_2`.
+The `List_find` function looks for the specified data `data` in the linked list `list`.
 
 | Type | Description |
 | ---- | ----------- |
 | `const List list` | The list to search in |
 | `const Data data` | Data to be searched |
-| `int (*fptr_match)(const Data data_1, const Data data_2)` | A callback function that compares values |
 
-Returns `Node` on success, *NULL* on failure.
+**Return value**: a linked list node (`Node`) on success, `NULL` on failure.
 
 ### List_remove_first
 
 ```C
-Data List_remove_first(List list);
+Data List_remove_first(List_t list);
 ```
 
-The `List_remove_first` funtion removes the first element from the list. It takes the only argument - the list to remove from. It returns `Data` from removed element.
+The `List_remove_first` funtion removes the first element from the list. It takes the only argument - the list to remove from. It returns `Data` from removed element. It's the user responsibility to free returned data if needed.
 
 | Type | Description |
 | ---- | ----------- |
-| `List list` | A list to remove from |
+| `List_t list` | A list to remove from |
 
-On success, the function returns `Data`, or *NULL* on failure. It's the user resposibility to deallocate `Data` if needed.
+**Return value**: data if deletion is success, `NULL` otherwise.
 
 ### List_remove_last
 
 ```C
-Data List_remove_last(List list);
+Data List_remove_last(List_t list);
 ```
 
-The `List_remove_last` function removes the last element from the list. It takes the only argument - the list to remove from. It returns a pointer to the data from removed element.
+The `List_remove_last` function removes the last element from the list. It takes the only argument - the list to remove from. It's the user responsibility to free returned data if needed.
 
 | Type | Description |
 | ---- | ----------- |
-| `List list` | A list to remove from |
+| `List_t list` | A list to remove from |
 
-On success, the function returns `Data`, or *NULL* on failure. It's the user resposibility to deallocate `Data` if needed.
+**Return value**: data if deletion is success, `NULL` otherwise.
 
 ### List_get_size
 
 ```C
-size_t List_get_size(const List list);
+size_t List_get_size(const List_t list);
 ```
 
 The `List_get_size` function returns a size of linked list.
 
 | Type | Description |
 | ---- | ----------- |
-| `const List list` | A list we want to know the size of |
+| `const List_t list` | A list we want to know the size of |
+
+**Return value**: the number of elements in the list if it's not `NULL`, *-1* otherwise.
 
 ### List_merge
 
 ```C
-int8_t List_merge(List* dest, List* src);
+int List_merge(List_t* dest, List_t* src);
 ```
 
 The `List_merge` function merges two lists into one (`src` into `dest`).
@@ -151,30 +155,32 @@ The `List_merge` function merges two lists into one (`src` into `dest`).
 | `List* dest` | A list to merge into |
 | `List* src` | A list to merge |
 
-Upon return (success), the `src` list is set to *NULL*.
+**Return value**: *0* if the merging is success, *-1* on failure.
 
 ### List_remove_node
 
 ```C
-Data List_remove_node(List list, Node node);
+Data List_remove_node(List_t list, Node node);
 ```
 
-The `List_remove_node` function removes the specified node from the list. It returns a pointer to data from removed node. The function returns *NULL* if the node was not removed. You can specify the `List_find` function for example, or any other function that returns `Nod*` in place of a `node` argument.
+The `List_remove_node` function removes the specified node from the list. You can specify the `List_find` function for example, or any other function that returns `Node*` in place of a `node` argument.
 
 | Type | Description |
 | ---- | ----------- |
-| `List list` | A list to remove from |
+| `List_t list` | A list to remove from |
 | `Node node`| A node to remove |
 
 On success, the function returns `Data`, or *NULL* on failure. It's the user resposibility to deallocate `Data` if needed.
 
+**Return value**: data if removing the element is successful, `NULL` otherwise.
+
 ### List_insert_before
 
 ```C
-int8_t List_insert_before(List list, const Data data, const Node node);
+int List_insert_before(List_t list, const Data data, const Node node);
 ```
 
-The `List_insert_before` function inserts a node with specified data in a list before another node. If `node` is *NULL*, the function behaves like the `List_insert_first` one.
+The `List_insert_before` function inserts a node with specified data in a list before another node. If `node` is *NULL*, the function behaves like the `List_insert_first` function.
 
 | Type | Description |
 | ---- | ----------- |
@@ -182,7 +188,7 @@ The `List_insert_before` function inserts a node with specified data in a list b
 | `const Data data` | Data to insert |
 | `const Node node` | A node to insert before (*insert before this node if it's in the list*) |
 
-On success, the function returns *1*, or *0* on failure.
+**Return value**: *0* if insertion is successful, *-1* otherwise.
 
 ### List_insert_after
 
@@ -198,7 +204,7 @@ The `List_insert_after` function inserts a node with specified data in a list af
 | `const Data data` | Data to insert |
 | `const Node node` | A node to insert after (*insert after this node if it's in the list*) |
 
-On success, the function returns *1*, or *0* on failure.
+**Return value**: *0* if insertion is successful, *-1* otherwise.
 
 ### List_destroy
 
@@ -210,9 +216,9 @@ The `List_destroy` function destroys a linked list. Primarally this means removi
 
 | Type | Description |
 | ---- | ----------- |
-| `List* list` | A pointer to a list to destroy |
+| `List_t* list` | A pointer to a list to destroy |
 
-Upon return, the list is *NULL*.
+**Return value**: none. The list is `NULL` upon completion.
 
 ## Examples
 
@@ -245,7 +251,7 @@ int match_int(Data data_1, Data data_2) {
 
 **Overflow may occur!**.
 
-The match function takes two parameters: `data_1` and `data_2`. The `data_1` parameter takes data of the list node, and `data_2` is data to compare with. Keep in mind that a match function accepts `void*` pointers, and you cast/dereference them to the appropriate type in a `callback` function body.
+The match function has two parameters: `data_1` and `data_2`. The `data_1` parameter expects data of the list node, and `data_2` is data to compare with. Keep in mind that match functions accepts `const Data`. A user must  cast and dereference them to the appropriate type in a `match` function body.
 
 If a list contains complex data (e.g., structs, for example), the user must decide how to compare them.
 
