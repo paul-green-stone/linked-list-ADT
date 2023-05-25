@@ -94,7 +94,7 @@ static Data Node_destroy(Node* node) {
 /* ================================ */
 /* ================================ */
 
-List_t List_new(fptr_destroy destroy_func, fptr_print print_func, fptr_match match_func) {
+List_t List_create(fptr_destroy destroy_func, fptr_print print_func, fptr_match match_func) {
     List_t list = NULL;
 
     if ((list = (List_t) malloc(sizeof(struct _linked_list))) != NULL) {
@@ -150,8 +150,8 @@ void List_print(const List_t list, fptr_print print_func) {
 
 /* ================================ */
 
-int8_t List_insert_first(List_t list, const Data data) {
-    int8_t result = 0;
+int List_insert_first(List_t list, const Data data) {
+    int8_t result = -1;
     Node node = NULL;
 
     if (list != NULL) {
@@ -171,7 +171,7 @@ int8_t List_insert_first(List_t list, const Data data) {
             }
 
             list->size++;
-            result = 1;
+            result = 0;
         }
     }
     else {
@@ -183,8 +183,8 @@ int8_t List_insert_first(List_t list, const Data data) {
 
 /* ================================ */
 
-int8_t List_insert_last(List_t list, const Data data) {
-    int8_t result = 0;
+int List_insert_last(List_t list, const Data data) {
+    int8_t result = -1;
     Node node = NULL;
 
     if (list != NULL) {
@@ -204,7 +204,7 @@ int8_t List_insert_last(List_t list, const Data data) {
             }
 
             list->size++;
-            result = 1;
+            result = 0;
         }
     }
     else {
@@ -342,8 +342,8 @@ void List_destroy(List_t* list) {
 
 /* ================================ */
 
-extern int8_t List_merge(List_t* dest, List_t* src) {
-    int8_t result = 0;
+extern int List_merge(List_t* dest, List_t* src) {
+    int result = -1;
 
     /* Test for dest */
     if ((dest != NULL) && (*dest != NULL)) {
@@ -356,7 +356,7 @@ extern int8_t List_merge(List_t* dest, List_t* src) {
             /* After the merge, the `src` list is eliminated */
             *src = NULL;
 
-            result = 1;
+            result = 0;
         }
     }
 
@@ -408,8 +408,8 @@ Data List_remove_node(List_t list, Node node) {
 
 /* ================================ */
 
-int8_t List_insert_after(List_t list, const Data data, const Node node) {
-    int8_t result = 0;
+int List_insert_after(List_t list, const Data data, const Node node) {
+    int result = -1;
 
     if (list != NULL) {
         if ((list->size == 0) || (node == NULL) || (node == list->tail)) {
@@ -430,7 +430,7 @@ int8_t List_insert_after(List_t list, const Data data, const Node node) {
 
                     list->size++;
 
-                    result = 1;
+                    result = 0;
                 }
                 else {
                     if (list->destroy != NULL) {
@@ -451,8 +451,8 @@ int8_t List_insert_after(List_t list, const Data data, const Node node) {
 
 /* ================================ */
 
-int8_t List_insert_before(List_t list, const Data data, const Node node) {
-    int8_t result = 0;
+int List_insert_before(List_t list, const Data data, const Node node) {
+    int result = -1;
 
     if (list != NULL) {
         if ((list->size == 0) || (node == NULL) || (node == list->head)) {
@@ -473,7 +473,7 @@ int8_t List_insert_before(List_t list, const Data data, const Node node) {
 
                     list->size++;
 
-                    result = 1;
+                    result = 0;
                 }
                 else {
                     if (list->destroy != NULL) {
