@@ -19,7 +19,6 @@ typedef int (*fptr_match)(const Data data_1, const Data data_2);
 
 /* ================================ */
 
-/* A pointer to an incomplite type */
 typedef struct _node* Node;
 
 struct _node {
@@ -37,7 +36,8 @@ struct _node {
     --------
 */
 
-/* A pointer to an incomplite type */
+/* ================ */
+
 typedef struct _linked_list* List_t;
 
 struct _linked_list {
