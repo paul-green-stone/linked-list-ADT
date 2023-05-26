@@ -31,7 +31,6 @@ static Data Node_destroy(Node* node) {
 
     if ((node != NULL) && (*node != NULL)) {
         data = (*node)->data;
-        (*node)->next = NULL;
 
         /* Clear memory*/
         memset(*node, 0, sizeof(struct _node));
@@ -105,7 +104,7 @@ void List_print(const List_t list, fptr_print print_func) {
 /* ================================ */
 
 int List_insert_first(List_t list, const Data data) {
-    int8_t result = -1;
+    int result = -1;
     Node node = NULL;
 
     if (list != NULL) {
@@ -138,7 +137,7 @@ int List_insert_first(List_t list, const Data data) {
 /* ================================ */
 
 int List_insert_last(List_t list, const Data data) {
-    int8_t result = -1;
+    int result = -1;
     Node node = NULL;
 
     if (list != NULL) {
@@ -199,7 +198,9 @@ int List_insert_last(List_t list, const Data data) {
 
  /* ================================ */
 
-Data List_remove_first(List_t list) {
+int List_remove_first(List_t list) {
+    int result = -1;
+
     Node node = NULL;
     Data data = NULL;
 
@@ -215,14 +216,21 @@ Data List_remove_first(List_t list) {
 
             list->size--;
 
+            /* Destroy the node. Return data it contained */
             data = Node_destroy(&node);
+
+            if (list->destroy != NULL) {
+                list->destroy(data);
+            }
+
+            result = 0;
         }
     }
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
 
-    return data;
+    return result;
 }
 
 /* ================================ */
@@ -233,9 +241,10 @@ size_t List_get_size(const List_t list) {
 
 /* ================================ */
 
-Data List_remove_last(List_t list) {
+int List_remove_last(List_t list) {
+    int result = -1;
+
     Node node = NULL;
-    /* Data to be returned */
     Data data = NULL;
 
     if (list != NULL) {
@@ -259,28 +268,28 @@ Data List_remove_last(List_t list) {
 
             /* Destroy the node. Return data it contained */
             data = Node_destroy(&node);
+
+            if (list->destroy != NULL) {
+                list->destroy(data);
+            }
+
+            result = 0;
         }
     }
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
 
-    return data;
+    return result;
 }
 
 /* ================================ */
 
 void List_destroy(List_t* list) {
-    Data data = NULL;
-
     if ((list != NULL) && (*list != NULL)) {
         /* Repeatedly delete elements */
         while ((*list)->size > 0) {
-            data = List_remove_first(*list);
-            
-            if ((*list)->destroy != NULL) {
-                (*list)->destroy(data);
-            }
+            List_remove_first(*list);
         }
 
         /* Clear memory */
@@ -319,21 +328,22 @@ extern int List_merge(List_t* dest, List_t* src) {
 
 /* ================================ */
 
-Data List_remove_node(List_t list, Node node) {
-    /* Data to be returned */
+int List_remove_node(List_t list, Node node) {
+    int result = -1;
+
     Data data = NULL;
 
     if (node == NULL) {
-        return data;
+        return result;
     }
 
     if (list != NULL) {
         if (list->size > 0) {
             if (node == list->head) {
-                data = List_remove_first(list); 
+                result = List_remove_first(list); 
             }
             else if (node == list->tail) {
-                data = List_remove_last(list);
+                result = List_remove_last(list);
             }
             else {
                 /* Used to traverse the list */
@@ -349,15 +359,21 @@ Data List_remove_node(List_t list, Node node) {
                     list->size--;
 
                     data = Node_destroy(&node);
+
+                    if (list->destroy != NULL) {
+                        list->destroy(data);
+                    }
                 }
             }
+
+            result = 0;
         }
     }
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
     
-    return data;
+    return result;
 }
 
 /* ================================ */
