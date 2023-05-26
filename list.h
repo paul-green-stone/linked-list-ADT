@@ -43,10 +43,10 @@ extern int List_insert_last(List_t list, const Data data);
 extern Node List_find(const List_t list, const Data data);
 
 /* Remove the first element from the list */
-extern Data List_remove_first(List_t list);
+extern int List_remove_first(List_t list);
 
 /* Remove the last element from the list */
-extern Data List_remove_last(List_t list);
+extern int List_remove_last(List_t list);
 
 /* Get the list size */
 extern size_t List_get_size(const List_t list);
@@ -58,7 +58,7 @@ extern void List_destroy(List_t* list);
 extern int List_merge(List_t* dest, List_t* src);
 
 /* Remove the specified node from the list */
-extern Data List_remove_node(List_t list, Node node);
+extern int List_remove_node(List_t list, Node node);
 
 /* Insert an element with the specified data after the node in the list */
 extern int List_insert_after(List_t list, const Data data, const Node node);
