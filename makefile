@@ -22,7 +22,7 @@ $(OBJDIR)/main.o: main.c
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJDIR) ./*.o *.out
+	rm -rf $(OBJDIR) ./*.o *.out ./*.a
 	rm -rf guard/$(OBJDIR)
 
 $(shell mkdir -p $(OBJDIR))
