@@ -326,18 +326,16 @@ int List_remove_last(List_t list) {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
 
-    return data;
+    return result;
 }
 
 /* ================================ */
 
 void List_destroy(List_t* list) {
-    Data data = NULL;
-
     if ((list != NULL) && (*list != NULL)) {
         /* Repeatedly delete elements */
         while ((*list)->size > 0) {
-            data = List_remove_first(*list);
+            List_remove_first(*list);
         }
 
         /* Clear memory */
@@ -382,16 +380,16 @@ int List_remove_node(List_t list, Node node) {
     Data data = NULL;
 
     if (node == NULL) {
-        return data;
+        return result;
     }
 
     if (list != NULL) {
         if (list->size > 0) {
             if (node == list->head) {
-                data = List_remove_first(list); 
+                List_remove_first(list); 
             }
             else if (node == list->tail) {
-                data = List_remove_last(list);
+                List_remove_last(list);
             }
             else {
                 /* Used to traverse the list */
