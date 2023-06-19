@@ -1,28 +1,33 @@
-cc = gcc
-OBJDIR = objects
-CFLAGS = -c -Wall -O1 -fpic
-AR = ar
-ARFLAGS = -r -c
+cc := gcc
 
-lib: $(OBJDIR)/list.o
-	$(AR) $(ARFLAGS) liblist.a $(OBJDIR)/list.o $(OBJDIR)/guard.o
+OBJDIR := objects
+CFLAGS := -g -O1
 
-$(OBJDIR)/list.o: list.h list.c $(OBJDIR)/guard.o
-	$(CC) -g $(CFLAGS) -o $(OBJDIR)/list.o list.c
+all: $(OBJDIR)/list.o $(OBJDIR)/guard.o
 
-$(OBJDIR)/guard.o: guard/guard.h guard/guard.c
-	$(cc) -g $(CFLAGS) -o $(OBJDIR)/guard.o guard/guard.c
+# Make a list.o object file
+$(OBJDIR)/list.o: ./src/list.h ./src/list.c
+	$(cc) -c $(CFLAGS) -o $@ ./src/list.c
 
-test: $(OBJDIR)/main.o liblist.a
-	$(CC) -o a.out $(OBJDIR)/main.o -L. -llist
+# Make a guard.o object file
+$(OBJDIR)/guard.o: ./guard/guard.h ./guard/guard.c
+	$(cc) -c $(CFLAGS) -o $@ ./guard/guard.c
 
-$(OBJDIR)/main.o: main.c
-	$(cc) -g $(CFLAGS) -o $(OBJDIR)/main.o main.c
+# Make a main.o object file
+$(OBJDIR)/main.o: ./test/main.c
+	$(cc) -c $(CFLAGS) -o $@ $^
+
+# Make a test program
+test: $(OBJDIR)/list.o $(OBJDIR)/guard.o $(OBJDIR)/main.o
+	$(cc) $(CFLAGS) -o a.out $^
+	
+# ================================================================ #
 
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJDIR) ./*.o *.out
-	rm -rf guard/$(OBJDIR)
+	rm -rf $(OBJDIR) ./*.a ./*.o ./*.out
+
+# ================================ #
 
 $(shell mkdir -p $(OBJDIR))
