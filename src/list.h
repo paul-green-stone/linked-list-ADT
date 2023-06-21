@@ -89,6 +89,16 @@ struct _linked_list {
 /* ================================================================ */
 
 /**
+ * Create a new node.
+ * 
+ * @param data data to be inserted into a new node
+ * @param caller_name name of the function that calls a Node_create function
+ * 
+ * @return A new instance of a node on success, NULL on failure.
+*/
+extern Node_t Node_create(const Data data);
+
+/**
  * Allocate a new instance of a linked list data type.
  * 
  * @param destroy pointer to a function that handles the deletion of a linked list node

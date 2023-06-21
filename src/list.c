@@ -5,52 +5,6 @@
 /* ================================================================ */
 
 /**
- * Create a new node.
- * 
- * @param data data to be inserted into a new node
- * @param caller_name name of the function that calls a Node_create function
- * 
- * @return A new instance of a node on success, NULL on failure.
-*/
-static Node_t __Node_create(const Data data, const char* caller_name) {
-    /* =========== VARIABLES ========== */
-
-    /* Node we are creating */
-    Node_t node = NULL;
-
-    /* ================================= */
-
-
-    
-    /* ================================================================ */
-    /* ====== Dynamically allocate memory for a linked list node ====== */
-    /* ============= YOU NEED TO CALL free ON THIS OBJECT ============= */
-    /* ================================================================ */
-
-    if ((node = (Node_t) malloc(sizeof(struct _node))) != NULL) {
-
-        /* Cast to avoid a warning message */
-        node->data = (Data) data;
-
-        /* A new node is isolated after creation */
-        node->next = NULL;
-    }
-    else {
-
-        /* We do not expose the function name */
-        warn_with_sys_msg(caller_name);
-    }
-
-
-
-    /* ================================= */
-
-    return node;
-}
-
-/* ================================================================ */
-
-/**
  *  Destroy the node.
  * 
  * @param node pointer to the Node_t node to be destroyed
@@ -106,8 +60,6 @@ static int __Node_destroy(Node_t* node, destroy_fptr destroy, const char* caller
         warn_with_user_msg(caller_name, "provided node is NULL");
     }
 
-
-
     /* ================================= */
 
     return result;
@@ -116,6 +68,38 @@ static int __Node_destroy(Node_t* node, destroy_fptr destroy, const char* caller
 /* ================================================================ */
 /* ============================ EXTERN ============================ */
 /* ================================================================ */
+
+Node_t Node_create(const Data data) {
+    /* =========== VARIABLES ========== */
+
+    /* Node we are creating */
+    Node_t node = NULL;
+
+    /* ================================= */
+
+
+    
+    /* ================================================================ */
+    /* ====== Dynamically allocate memory for a linked list node ====== */
+    /* ============= YOU NEED TO CALL free ON THIS OBJECT ============= */
+    /* ================================================================ */
+
+    if ((node = (Node_t) malloc(sizeof(struct _node))) != NULL) {
+
+        /* Cast to avoid a warning message */
+        node->data = (Data) data;
+
+        /* A new node is isolated after creation */
+        node->next = NULL;
+    }
+    else {
+        warn_with_sys_msg(__func__);
+    }
+
+    /* ================================= */
+
+    return node;
+}
 
 List_t List_create(destroy_fptr destroy, print_fptr print, match_fptr match) {
     /* =========== VARIABLES ========== */
@@ -242,7 +226,7 @@ int List_insert_first(List_t list, const Data data) {
     if (list != NULL) {
 
         /* ====================== Create a new node  ====================== */
-        if ((node = __Node_create(data, __func__)) != NULL) {
+        if ((node = Node_create(data)) != NULL) {
 
             switch (list->size) {
 
@@ -306,7 +290,7 @@ int List_insert_last(List_t list, const Data data) {
     if (list != NULL) {
 
         /* ====================== Create a new node  ====================== */
-        if ((node = __Node_create(data, __func__)) != NULL) {
+        if ((node = Node_create(data)) != NULL) {
 
             /* If the list is empty */
             switch (list->size) {
@@ -717,7 +701,7 @@ int List_insert_after(List_t list, const Data data, const Node_t node) {
         else {
 
             /* ====================== Create a new node  ====================== */
-            if ((new_node = __Node_create(data, __func__)) != NULL) {
+            if ((new_node = Node_create(data)) != NULL) {
 
                 /* Make sure the specified node is in the list */
                 for (temp = list->head; temp != NULL && temp != node; temp = temp->next) ;
@@ -780,7 +764,7 @@ int List_insert_before(List_t list, const Data data, const Node_t node) {
         else {
             
             /* ====================== Create a new node  ====================== */
-            if ((new_node = __Node_create(data, __func__)) != NULL) {
+            if ((new_node = Node_create(data)) != NULL) {
 
                 /* Make sure the specified node is in the list */
                 for (temp = list->head; (temp != NULL) && (temp->next != node); temp = temp->next) ;
