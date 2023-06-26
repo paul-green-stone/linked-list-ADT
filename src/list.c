@@ -8,12 +8,11 @@
  *  Destroy the node.
  * 
  * @param node pointer to the Node_t node to be destroyed
- * @param destroy derived from a linked list destroy method
- * @param caller_name name of the function that calls a Node_create function
+ * @param caller_name name of the function that calls a Node_destroy function or NULL
  * 
- * @return 0 on success, 1 on failure.
+ * @return a pointer to data to be deleted.
 */
-static int __Node_destroy(Node_t* node, destroy_fptr destroy, const char* caller_name) {
+static Data __Node_destroy(Node_t* node, const char* func_name) {
     /* =========== VARIABLES ========== */
 
     /* Data to be destroyed */
@@ -38,31 +37,24 @@ static int __Node_destroy(Node_t* node, destroy_fptr destroy, const char* caller
         /* Clear memory*/
         memset(*node, 0, sizeof(struct _node));
 
-        /* ================================= */
-
         /* Deallocate memory */
         free(*node);
 
-        /* Destroy data */
-        if (destroy != NULL) {
-            destroy(data);
-        }
-
-        /* ================================= */
-
         /* Explicitly set a node to NULL */
         *node = NULL;
+
+        /* ================================= */
 
         /* Success */
         result = 0;
     }
     else {
-        warn_with_user_msg(caller_name, "provided node is NULL");
+        warn_with_user_msg((func_name == NULL) ? __func__ : func_name, "provided node is NULL");
     }
 
     /* ================================= */
 
-    return result;
+    return Data;
 }
 
 /* ================================================================ */
@@ -101,6 +93,8 @@ Node_t Node_create(const Data data) {
     return node;
 }
 
+/* ================================================================ */
+
 List_t List_create(destroy_fptr destroy, print_fptr print, match_fptr match) {
     /* =========== VARIABLES ========== */
 
@@ -135,8 +129,6 @@ List_t List_create(destroy_fptr destroy, print_fptr print, match_fptr match) {
     else {
         warn_with_sys_msg(__func__);
     }
-
-
 
     /* ================================= */
 
@@ -197,8 +189,6 @@ void List_print(const List_t list, print_fptr print) {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
 
-
-
     /* ================================= */
 
     return ;
@@ -239,7 +229,7 @@ int List_insert_first(List_t list, const Data data) {
                 /* If there are nodes in the list */
                 default:
 
-                    /* Make a */
+                    /* Connect a new node with the list head */
                     node->next = list->head;
 
                     /* Set a new node to be the head of the list */
@@ -260,8 +250,6 @@ int List_insert_first(List_t list, const Data data) {
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
-
-
 
     /* ================================ */
 
@@ -323,8 +311,6 @@ int List_insert_last(List_t list, const Data data) {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
 
-
-
     /* ================================ */
 
     return result;
@@ -375,8 +361,6 @@ Node_t List_find(const List_t list, const Data data, match_fptr match) {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
 
-
-
     /* ================================ */
 
     return node;
@@ -393,6 +377,9 @@ int List_remove_first(List_t list) {
     /* Node to be deleted */
     Node_t node = NULL;
 
+    /* Data to be deleted */
+    Data data = NULL;
+
     /* ================================= */
 
 
@@ -405,20 +392,28 @@ int List_remove_first(List_t list) {
 
         /* If the list is not empty */
         if (list->size > 0) {
+
             node = list->head;
 
             /* Set a new list head */
             list->head = node->next;
 
             if (list->size == 1) {
-                list->tail = list->head;
+                list->tail = list->head = NULL;
             }
 
             /* Update the list size */
             list->size--;
 
             /* Destroy the node */
-            __Node_destroy(&node, list->destroy, __func__);
+            data = __Node_destroy(&node, __func__);
+
+            /* destroy data if needed */
+            if (list->destroy != NULL) {
+                list->destroy(data);
+            }
+
+            /* ================================ */
 
             /* Success */
             result = 0;
@@ -427,8 +422,6 @@ int List_remove_first(List_t list) {
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
-
-
 
     /* ================================ */
 
@@ -449,6 +442,9 @@ int List_remove_last(List_t list) {
     /* Node that is used to traverse the list */
     Node_t temp = NULL;
 
+    /* Data to be deleted */
+    Data data = NULL;   
+
     /* ================================ */
 
     
@@ -461,6 +457,7 @@ int List_remove_last(List_t list) {
 
         /* If the list is not empty */
         if (list->size > 0) {
+
             node = list->tail;
 
             /* Special case */
@@ -475,13 +472,21 @@ int List_remove_last(List_t list) {
 
                 /* Set a new list tail */
                 list->tail = temp;
+
                 temp->next = NULL;
             }
 
+            /* Update the list size */
             list->size--;
 
             /* Destroy the node */
-            __Node_destroy(&node, list->destroy, __func__);
+            data =  __Node_destroy(&node, __func__);
+
+            if (list->destroy != NULL) {
+                list->destroy(data);
+            }
+
+            /* ================================ */
 
             /* Success */
             result = 0;
@@ -490,8 +495,6 @@ int List_remove_last(List_t list) {
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
-
-
 
     /* ================================ */
 
@@ -573,17 +576,15 @@ extern int List_merge(const List_t* dest, List_t* src) {
             /* Compute a new size */
             (*dest)->size += (*src)->size;
 
-            /* ================================ */
-
             /* After the merge, the `src` list is eliminated */
             *src = NULL;
+
+            /* ================================ */
 
             /* Success */
             result = 0;
         }
     }
-
-
 
     /* ================================ */
 
@@ -716,12 +717,18 @@ int List_insert_after(List_t list, const Data data, const Node_t node) {
                     /* Update size */
                     list->size++;
 
+                    /* ================================ */
+
                     /* Success */
                     result = 0;
                 }
                 /* If the list doesn't contain such a node */
                 else {
-                    __Node_destroy(&new_node, list->destroy, __func__);
+                    __Node_destroy(&new_node, __func__);
+
+                    if (list->destroy != NULL) {
+                        list->destroy(data);
+                    }
                 }
             }
         }
@@ -778,13 +785,19 @@ int List_insert_before(List_t list, const Data data, const Node_t node) {
 
                     /* Update the size */
                     list->size++;
+
+                    /* ================================ */
                     
                     /* Success */
                     result = 0;
                 }
                 /* Node is not in the list */
                 else {
-                    __Node_destroy(&new_node, list->destroy, __func__);
+                    __Node_destroy(&new_node, __func__);
+
+                    if (list->destroy != NULL) {
+                        list->destroy(data);
+                    }
                 }
             }
         }
@@ -792,8 +805,6 @@ int List_insert_before(List_t list, const Data data, const Node_t node) {
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
-
-
 
     /* ================================ */
 

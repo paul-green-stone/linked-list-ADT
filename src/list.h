@@ -28,25 +28,6 @@ typedef struct _linked_list* List_t;
 
 /* ================================ */
 
-/**
- * A typedef of an encapsulated print function passed to List_create
-*/
-typedef void (*print_fptr)(const Data data);
-
-/* ================================ */
-
-/**
- * A typedef of an encapsulated destroy function passed to List_create
-*/
-typedef void (*destroy_fptr)(Data data);
-
-/* ================================ */
-
-/**
- * A typedef of an encapsulated match function passed to List_create
-*/
-typedef int (*match_fptr)(const Data data_1, const Data data_2);
-
 /* ================================================================ */
 /* ====================== TYPES IMPLEMENTAION ===================== */
 /* ================================================================ */
