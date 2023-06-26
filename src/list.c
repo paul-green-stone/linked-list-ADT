@@ -54,7 +54,7 @@ static Data __Node_destroy(Node_t* node, const char* func_name) {
 
     /* ================================= */
 
-    return Data;
+    return data;
 }
 
 /* ================================================================ */
@@ -556,7 +556,7 @@ extern int List_merge(const List_t* dest, List_t* src) {
 
 
     /* ================================================================ */
-    /* ================== Make sure dest is not NULL ================== */
+    /* ================== Make sure dest    is not NULL ================== */
     /* ================================================================ */
 
     if ((dest != NULL) && (*dest != NULL)) {
@@ -650,7 +650,7 @@ int List_remove_node(List_t list, Node_t node) {
                     /* Update the size */
                     list->size--;
 
-                    __Node_destroy(&node, list->destroy, __func__);
+                    __Node_destroy(&node, __func__);
                 }
             }
 
