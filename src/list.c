@@ -18,7 +18,6 @@ static Data __Node_destroy(Node_t* node, const char* func_name) {
     /* Data to be destroyed */
     Data data = NULL;
 
-    /* Operation result */
     int result = 1;
 
     /* ================================= */
@@ -31,21 +30,19 @@ static Data __Node_destroy(Node_t* node, const char* func_name) {
 
     if ((node != NULL) && (*node != NULL)) {
 
-        /* Keep a pointer to data */
+        /* Store data */
         data = (*node)->data;
 
-        /* Clear memory*/
+        /* Clear memory */
         memset(*node, 0, sizeof(struct _node));
 
         /* Deallocate memory */
         free(*node);
 
-        /* Explicitly set a node to NULL */
         *node = NULL;
 
         /* ================================= */
 
-        /* Success */
         result = 0;
     }
     else {
@@ -64,7 +61,6 @@ static Data __Node_destroy(Node_t* node, const char* func_name) {
 Node_t Node_create(const Data data) {
     /* =========== VARIABLES ========== */
 
-    /* Node we are creating */
     Node_t node = NULL;
 
     /* ================================= */
@@ -78,10 +74,9 @@ Node_t Node_create(const Data data) {
 
     if ((node = (Node_t) malloc(sizeof(struct _node))) != NULL) {
 
-        /* Cast to avoid a warning message */
+        /* =============== Cast to avoid a warning message ================ */
         node->data = (Data) data;
 
-        /* A new node is isolated after creation */
         node->next = NULL;
     }
     else {
@@ -112,18 +107,15 @@ List_t List_create(destroy_fptr destroy, print_fptr print, match_fptr match) {
 
     if ((list = (List_t) malloc(sizeof(struct _linked_list))) != NULL) {
 
-        /* Clear the memory */
+        /* Clear the memory/set some of the fields to its initial values */
         memset(list, 0, sizeof(struct _linked_list));
 
         /* ================================= */
 
-        /* Set a destroy function */
         list->destroy = destroy;
 
-        /* Set a print function */
         list->print = print;
 
-        /* Set a match function */
         list->match = match;
     }
     else {
@@ -199,11 +191,10 @@ void List_print(const List_t list, print_fptr print) {
 int List_insert_first(List_t list, const Data data) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
-    /* Node we want to place data into */
+    /* Node we want to add */
     Node_t node = NULL;
+
+    int result = -1;
 
     /* ================================= */
 
@@ -238,10 +229,10 @@ int List_insert_first(List_t list, const Data data) {
                     break ;
             }
 
-            /* Update the list size */
             list->size++;
 
-            /* Success */
+            /* ================================= */
+
             result = 0;
         }
 
@@ -261,11 +252,10 @@ int List_insert_first(List_t list, const Data data) {
 int List_insert_last(List_t list, const Data data) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
-    /* Node we want to place data into */
+    /* Node we want to add */
     Node_t node = NULL;
+
+    int result = -1;
 
     /* ================================= */
 
@@ -289,19 +279,17 @@ int List_insert_last(List_t list, const Data data) {
 
                 default:
 
-                    /* Insert an element at the end */
                     list->tail->next = node;
 
-                    /* Set a node to be the new tail of the list */
                     list->tail = node;
 
                     break ;
             }
 
-            /* Update the list size */
             list->size++;
 
-            /* Success */
+            /* ================================ */
+            
             result = 0;
         }
 
@@ -321,7 +309,7 @@ int List_insert_last(List_t list, const Data data) {
 Node_t List_find(const List_t list, const Data data, match_fptr match) {
     /* =========== VARIABLES ========== */
 
-    /* Alternative print function */
+    /* Alternative match function */
     match_fptr alt_match = NULL;
 
     /* Node we are using to traverse the list */
@@ -348,8 +336,6 @@ Node_t List_find(const List_t list, const Data data, match_fptr match) {
 
             /* ================================= */
 
-
-
             /* Use alternative match function if provided */
             alt_match = (match != NULL) ? match : list->match;
 
@@ -371,14 +357,13 @@ Node_t List_find(const List_t list, const Data data, match_fptr match) {
 int List_remove_first(List_t list) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
     /* Node to be deleted */
     Node_t node = NULL;
 
     /* Data to be deleted */
     Data data = NULL;
+
+    int result = -1;
 
     /* ================================= */
 
@@ -408,14 +393,13 @@ int List_remove_first(List_t list) {
             /* Destroy the node */
             data = __Node_destroy(&node, __func__);
 
-            /* destroy data if needed */
+            /* Destroy data if needed */
             if (list->destroy != NULL) {
                 list->destroy(data);
             }
 
             /* ================================ */
 
-            /* Success */
             result = 0;
         }
     }
@@ -433,9 +417,6 @@ int List_remove_first(List_t list) {
 int List_remove_last(List_t list) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
     /* Node to be deleted */
     Node_t node = NULL;
 
@@ -444,6 +425,8 @@ int List_remove_last(List_t list) {
 
     /* Data to be deleted */
     Data data = NULL;   
+
+    int result = -1;
 
     /* ================================ */
 
@@ -476,7 +459,6 @@ int List_remove_last(List_t list) {
                 temp->next = NULL;
             }
 
-            /* Update the list size */
             list->size--;
 
             /* Destroy the node */
@@ -488,7 +470,6 @@ int List_remove_last(List_t list) {
 
             /* ================================ */
 
-            /* Success */
             result = 0;
         }
     }
@@ -532,7 +513,8 @@ int List_destroy(List_t* list) {
 
         *list = NULL;
 
-        /* Success */
+        /* ================================ */
+
         result = 0;
     }
 
@@ -548,7 +530,6 @@ int List_destroy(List_t* list) {
 extern int List_merge(const List_t* dest, List_t* src) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
     int result = -1;
 
     /* ================================ */
@@ -556,7 +537,7 @@ extern int List_merge(const List_t* dest, List_t* src) {
 
 
     /* ================================================================ */
-    /* ================== Make sure dest    is not NULL ================== */
+    /* ================== Make sure dest is not NULL ================== */
     /* ================================================================ */
 
     if ((dest != NULL) && (*dest != NULL)) {
@@ -581,7 +562,6 @@ extern int List_merge(const List_t* dest, List_t* src) {
 
             /* ================================ */
 
-            /* Success */
             result = 0;
         }
     }
@@ -596,11 +576,12 @@ extern int List_merge(const List_t* dest, List_t* src) {
 int List_remove_node(List_t list, Node_t node) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
     /* Node that is used to traverse the list */
     Node_t temp = NULL;
+
+    Data data = NULL;
+
+    int result = -1;
 
     /* ================================ */
 
@@ -613,8 +594,6 @@ int List_remove_node(List_t list, Node_t node) {
     if (node == NULL) {
         return result;
     }
-
-
 
     /* ================================================================ */
     /* ================= Make sure a list is not NULL ================= */
@@ -644,25 +623,26 @@ int List_remove_node(List_t list, Node_t node) {
                 /* The node IS in the list */
                 if (temp != NULL) {
 
-                    /**/
                     temp->next = temp->next->next;
 
-                    /* Update the size */
                     list->size--;
 
-                    __Node_destroy(&node, __func__);
+                    data = __Node_destroy(&node, __func__);
+
+                    if (list->destroy != NULL) {
+                        list->destroy(data);
+                    }
                 }
             }
 
-            /* Success */
+            /* ================================ */
+
             result = 0;
         }
     }
     else {
         warn_with_user_msg(__func__, "provided list is NULL");
     }
-
-
 
     /* ================================ */
     
@@ -674,14 +654,13 @@ int List_remove_node(List_t list, Node_t node) {
 int List_insert_after(List_t list, const Data data, const Node_t node) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
     /* Node that is used to traverse the list */
     Node_t temp = NULL;
 
     /* Node we are creating */
     Node_t new_node = NULL;
+
+    int result = -1;
 
     /* ================================ */
 
@@ -710,16 +689,14 @@ int List_insert_after(List_t list, const Data data, const Node_t node) {
                 /* The node IS in the list */
                 if (temp != NULL) {
 
-                    /* "Rearrange" the list */
                     new_node->next = temp->next;
+
                     temp->next = new_node;
 
-                    /* Update size */
                     list->size++;
 
                     /* ================================ */
 
-                    /* Success */
                     result = 0;
                 }
                 /* If the list doesn't contain such a node */
@@ -745,14 +722,13 @@ int List_insert_after(List_t list, const Data data, const Node_t node) {
 int List_insert_before(List_t list, const Data data, const Node_t node) {
     /* =========== VARIABLES ========== */
 
-    /* Operation result */
-    int result = -1;
-
     /* Node that is used to traverse the list */
     Node_t temp = NULL;
 
     /* Node we are creating */
     Node_t new_node = NULL;
+
+    int result = -1;
 
     /* ================================ */
 
@@ -779,16 +755,14 @@ int List_insert_before(List_t list, const Data data, const Node_t node) {
                 /* The node IS in the list */
                 if (temp != NULL) {
 
-                    /* "Rearrange" the list */
                     new_node->next = temp->next;
+
                     temp->next = new_node;
 
-                    /* Update the size */
                     list->size++;
 
                     /* ================================ */
                     
-                    /* Success */
                     result = 0;
                 }
                 /* Node is not in the list */
