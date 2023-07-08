@@ -1,3 +1,12 @@
+# linked-list-ADT
+
+A linked list is a data type that consists of a number of elements grouped, or linked, together in a specific order.
+
+## Table of Contents
+
+1. [Installation](#installation)
+2. [API Reference](https://github.com/paul-green-stone/linked-list-ADT/wiki/API-Reference)
+
 # Installation
 
 Clone the repository:
