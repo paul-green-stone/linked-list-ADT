@@ -112,7 +112,7 @@ extern void List_print(const List_t list, print_fptr print);
  * 
  * @return 0 on success, negative value on error.
 */
-extern int List_insert_first(List_t list, const Data data);
+extern int List_insert_first(const List_t list, const Data data);
 
 /* ================================================================ */
 
@@ -124,7 +124,7 @@ extern int List_insert_first(List_t list, const Data data);
  * 
  * @return 0 on success, negative value on error.
 */
-extern int List_insert_last(List_t list, const Data data);
+extern int List_insert_last(const List_t list, const Data data);
 
 /* ================================================================ */
 
@@ -148,7 +148,7 @@ extern Node_t List_find(const List_t list, const Data data, match_fptr match);
  * 
  * @return 0 on success, negative value on failure.
 */
-extern int List_remove_first(List_t list);
+extern int List_remove_first(const List_t list);
 
 /* ================================================================ */
 
@@ -159,7 +159,7 @@ extern int List_remove_first(List_t list);
  * 
  * @return 0 on success, negative value on failure.
 */
-extern int List_remove_last(List_t list);
+extern int List_remove_last(const List_t list);
 
 /* ================================================================ */
 
@@ -207,7 +207,7 @@ extern int List_remove_node(const List_t list, Node_t node);
  * 
  * @return 0 on success, negative value on failure.
 */
-extern int List_insert_after(List_t list, const Data data, const Node_t node);
+extern int List_insert_after(const List_t list, const Data data, const Node_t node);
 
 /* ================================================================ */
 
@@ -220,7 +220,7 @@ extern int List_insert_after(List_t list, const Data data, const Node_t node);
  * 
  * @return 0 on success, negative value on failure.
 */
-extern int List_insert_before(List_t list, const Data data, const Node_t node);
+extern int List_insert_before(const List_t list, const Data data, const Node_t node);
 
 /* ================================================================ */
 

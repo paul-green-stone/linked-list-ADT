@@ -188,7 +188,7 @@ void List_print(const List_t list, print_fptr print) {
 
 /* ================================================================ */
 
-int List_insert_first(List_t list, const Data data) {
+int List_insert_first(const List_t list, const Data data) {
     /* =========== VARIABLES ========== */
 
     /* Node we want to add */
@@ -249,7 +249,7 @@ int List_insert_first(List_t list, const Data data) {
 
 /* ================================================================ */
 
-int List_insert_last(List_t list, const Data data) {
+int List_insert_last(const List_t list, const Data data) {
     /* =========== VARIABLES ========== */
 
     /* Node we want to add */
@@ -354,7 +354,7 @@ Node_t List_find(const List_t list, const Data data, match_fptr match) {
 
  /* ================================================================ */
 
-int List_remove_first(List_t list) {
+int List_remove_first(const List_t list) {
     /* =========== VARIABLES ========== */
 
     /* Node to be deleted */
@@ -414,7 +414,7 @@ int List_remove_first(List_t list) {
 
 /* ================================================================ */
 
-int List_remove_last(List_t list) {
+int List_remove_last(const List_t list) {
     /* =========== VARIABLES ========== */
 
     /* Node to be deleted */
@@ -557,7 +557,13 @@ extern int List_merge(const List_t* dest, List_t* src) {
             /* Compute a new size */
             (*dest)->size += (*src)->size;
 
+            /* ================================ */
+
             /* After the merge, the `src` list is eliminated */
+            memset(*src, 0, sizeof(struct _linked_list));
+
+            List_destroy(src);
+
             *src = NULL;
 
             /* ================================ */
@@ -573,7 +579,7 @@ extern int List_merge(const List_t* dest, List_t* src) {
 
 /* ================================================================ */
 
-int List_remove_node(List_t list, Node_t node) {
+int List_remove_node(const List_t list, Node_t node) {
     /* =========== VARIABLES ========== */
 
     /* Node that is used to traverse the list */
@@ -651,7 +657,7 @@ int List_remove_node(List_t list, Node_t node) {
 
 /* ================================================================ */
 
-int List_insert_after(List_t list, const Data data, const Node_t node) {
+int List_insert_after(const List_t list, const Data data, const Node_t node) {
     /* =========== VARIABLES ========== */
 
     /* Node that is used to traverse the list */
@@ -719,7 +725,7 @@ int List_insert_after(List_t list, const Data data, const Node_t node) {
 
 /* ================================================================ */
 
-int List_insert_before(List_t list, const Data data, const Node_t node) {
+int List_insert_before(const List_t list, const Data data, const Node_t node) {
     /* =========== VARIABLES ========== */
 
     /* Node that is used to traverse the list */
